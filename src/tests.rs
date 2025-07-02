@@ -115,10 +115,62 @@ fn system_and_balances_work() {
 }
 
 #[test]
+fn create_kitty_checks_signed() {
+	new_test_ext().execute_with(|| {
+		// The `create_kitty` extrinsic should work when being called by a user.
+		assert_ok!(PalletKitties::create_kitty(RuntimeOrigin::signed(ALICE)));
+		// The `create_kitty` extrinsic should fail when being called by an unsigned message.
+		assert_noop!(PalletKitties::create_kitty(RuntimeOrigin::none()), DispatchError::BadOrigin);
+	})
+}
+
+#[test]
+fn create_kitty_emits_event() {
+	new_test_ext().execute_with(|| {
+		// We need to set block number to 1 to view events.
+		System::set_block_number(1);
+		// Execute our call, and ensure it is successful.
+		assert_ok!(PalletKitties::create_kitty(RuntimeOrigin::signed(ALICE)));
+		// Assert the last event by our blockchain is the `Created` event with the correct owner.
+		System::assert_last_event(Event::<TestRuntime>::Created { owner: 1 }.into());
+	})
+}
+
+#[test]
+fn count_for_kitties_created_correctly() {
+	new_test_ext().execute_with(|| {
+		// Querying storage before anything is set will return `None`.
+		assert_eq!(CountForKitten::<TestRuntime>::get(), None);
+		// You can `set` the value using an `Option<u32>`.
+		CountForKitten::<TestRuntime>::set(Some(1337u32));
+		// You can `put` the value directly with a `u32`.
+		CountForKitten::<TestRuntime>::put(1337u32);
+		// Check that the value is now in storage.
+		assert_eq!(CountForKitten::<TestRuntime>::get(), Some(1337u32));
+	})
+}
+
+#[test]
 fn mint_increments_count_for_kitty() {
 	new_test_ext().execute_with(|| {
+		// Querying storage before anything is set will return `None`.
 		assert_eq!(CountForKitten::<TestRuntime>::get(), None);
+		// Call `create_kitty` which will call `mint`.
 		assert_ok!(PalletKitties::create_kitty(RuntimeOrigin::signed(ALICE)));
+		// Now the storage should be `Some(1)`
 		assert_eq!(CountForKitten::<TestRuntime>::get(), Some(1));
+	})
+}
+
+#[test]
+fn mint_errors_when_overflow() {
+	new_test_ext().execute_with(|| {
+		// Set the count to the largest value possible.
+		CountForKitten::<TestRuntime>::set(Some(u32::MAX));
+		// `create_kitty` should not succeed because of safe math.
+		assert_noop!(
+			PalletKitties::create_kitty(RuntimeOrigin::signed(1)),
+			Error::<TestRuntime>::TooManyKitties
+		);
 	})
 }
