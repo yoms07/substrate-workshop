@@ -113,3 +113,12 @@ fn system_and_balances_work() {
 		assert_ok!(PalletBalances::mint_into(&BOB, 100));
 	});
 }
+
+#[test]
+fn mint_increments_count_for_kitty() {
+	new_test_ext().execute_with(|| {
+		assert_eq!(CountForKitten::<TestRuntime>::get(), None);
+		assert_ok!(PalletKitties::create_kitty(RuntimeOrigin::signed(ALICE)));
+		assert_eq!(CountForKitten::<TestRuntime>::get(), Some(1));
+	})
+}
