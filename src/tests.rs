@@ -229,3 +229,13 @@ fn create_kitty_makes_unique_kitties() {
 		assert_eq!(Kitties::<TestRuntime>::iter().count(), 2);
 	})
 }
+
+#[test]
+fn kitties_owned_created_correctly() {
+	new_test_ext().execute_with(|| {
+		assert_eq!(KittiesOwned::<TestRuntime>::get(1).len(), 0);
+		assert_ok!(PalletKitties::create_kitty(RuntimeOrigin::signed(ALICE)));
+		assert_ok!(PalletKitties::create_kitty(RuntimeOrigin::signed(BOB)));
+		assert_eq!(KittiesOwned::<TestRuntime>::get(ALICE).len(), 1);
+	})
+}
