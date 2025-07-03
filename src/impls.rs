@@ -16,6 +16,11 @@ impl<T: Config> Pallet<T> {
 		Ok(())
 	}
 
+	pub fn do_transfer(from: T::AccountId, to: T::AccountId, kitty_id: [u8; 32]) -> DispatchResult {
+		Self::deposit_event(Event::<T>::Transferred { from, to, kitty_id });
+		Ok(())
+	}
+
 	pub fn gen_dna() -> [u8; 32] {
 		let unique_payload = (
 			frame_system::Pallet::<T>::parent_hash(),
