@@ -1,5 +1,7 @@
 use super::*;
 use frame::prelude::*;
+use frame::primitives::BlakeTwo256;
+use frame::traits::Hash;
 
 impl<T: Config> Pallet<T> {
 	pub fn mint(owner: T::AccountId, dna: [u8; 32]) -> DispatchResult {
@@ -11,5 +13,16 @@ impl<T: Config> Pallet<T> {
 		CountForKitten::<T>::set(new_count);
 		Self::deposit_event(Event::<T>::Created { owner });
 		Ok(())
+	}
+
+	pub fn gen_dna() -> [u8; 32] {
+		let unique_payload = (
+			frame_system::Pallet::<T>::parent_hash(),
+			frame_system::Pallet::<T>::block_number(),
+			frame_system::Pallet::<T>::extrinsic_index(),
+			CountForKitten::<T>::get(),
+		);
+
+		BlakeTwo256::hash_of(&unique_payload).into()
 	}
 }
