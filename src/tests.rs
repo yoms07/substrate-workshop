@@ -239,3 +239,17 @@ fn kitties_owned_created_correctly() {
 		assert_eq!(KittiesOwned::<TestRuntime>::get(ALICE).len(), 1);
 	})
 }
+
+#[test]
+fn cannot_own_too_many_kitties() {
+	new_test_ext().execute_with(|| {
+		for _ in 1..=100 {
+			assert_ok!(PalletKitties::create_kitty(RuntimeOrigin::signed(ALICE)));
+		}
+
+		assert_noop!(
+			PalletKitties::create_kitty(RuntimeOrigin::signed(ALICE)),
+			Error::<TestRuntime>::TooManyOwned
+		);
+	})
+}
