@@ -41,6 +41,15 @@ impl<T: Config> Pallet<T> {
 		Ok(())
 	}
 
+	pub fn do_set_price(
+		caller: T::AccountId,
+		kitty_id: [u8; 32],
+		new_price: Option<BalanceOf<T>>,
+	) -> DispatchResult {
+		Self::deposit_event(Event::<T>::PriceSet { owner: caller, kitty_id, new_price });
+		Ok(())
+	}
+
 	pub fn gen_dna() -> [u8; 32] {
 		let unique_payload = (
 			frame_system::Pallet::<T>::parent_hash(),

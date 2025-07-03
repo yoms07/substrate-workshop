@@ -318,3 +318,16 @@ fn native_balance_associated_type_works() {
 fn balance_of_type_works() {
 	let _example_balance: BalanceOf<TestRuntime> = 1337u64;
 }
+
+#[test]
+fn set_price_emit_events() {
+	new_test_ext().execute_with(|| {
+		System::set_block_number(1);
+		assert_ok!(PalletKitties::create_kitty(RuntimeOrigin::signed(ALICE)));
+		let kitty_id = Kitties::<TestRuntime>::iter_keys().collect::<Vec<_>>()[0];
+		assert_ok!(PalletKitties::set_price(RuntimeOrigin::signed(ALICE), kitty_id, Some(1337)));
+		System::assert_last_event(
+			Event::<TestRuntime>::PriceSet { owner: ALICE, kitty_id, new_price: Some(1337) }.into(),
+		);
+	})
+}
