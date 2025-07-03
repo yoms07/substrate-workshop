@@ -29,6 +29,9 @@ type Block = frame_system::mocking::MockBlock<TestRuntime>;
 const ALICE: u64 = 1;
 const BOB: u64 = 2;
 
+#[allow(unused)]
+const DEFAULT_KITTY: Kitty<TestRuntime> = Kitty { dna: [0u8; 32], owner: 0 };
+
 #[runtime]
 mod runtime {
 	#[runtime::derive(

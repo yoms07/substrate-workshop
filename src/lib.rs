@@ -36,6 +36,11 @@ pub mod pallet {
 		DuplicateKitty,
 	}
 
+	pub struct Kitty<T: Config> {
+		pub dna: [u8; 32],
+		pub owner: T::AccountId,
+	}
+
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
 		pub fn create_kitty(origin: OriginFor<T>) -> DispatchResult {
