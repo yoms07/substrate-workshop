@@ -19,7 +19,7 @@ pub mod pallet {
 	}
 
 	#[pallet::storage]
-	pub(super) type CountForKitten<T: Config> = StorageValue<Value = u32>;
+	pub(super) type CountForKitten<T: Config> = StorageValue<Value = u32, QueryKind = ValueQuery>;
 
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
