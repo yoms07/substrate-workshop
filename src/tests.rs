@@ -30,7 +30,7 @@ const ALICE: u64 = 1;
 const BOB: u64 = 2;
 
 #[allow(unused)]
-const DEFAULT_KITTY: Kitty<TestRuntime> = Kitty { dna: [0u8; 32], owner: 0 };
+const DEFAULT_KITTY: Kitty<TestRuntime> = Kitty { dna: [0u8; 32], owner: 0, price: None };
 
 #[runtime]
 mod runtime {
@@ -312,4 +312,9 @@ fn native_balance_associated_type_works() {
 			1337
 		);
 	})
+}
+
+#[test]
+fn balance_of_type_works() {
+	let _example_balance: BalanceOf<TestRuntime> = 1337u64;
 }
