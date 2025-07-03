@@ -54,6 +54,8 @@ pub mod pallet {
 		TransferToSelf,
 		NoKitty,
 		NotOwner,
+		NotForSale,
+		MaxPriceTooLow,
 	}
 
 	#[derive(Encode, Decode, TypeInfo, MaxEncodedLen)]

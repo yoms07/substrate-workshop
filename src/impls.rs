@@ -1,6 +1,7 @@
 use super::*;
 use frame::prelude::*;
 use frame::primitives::BlakeTwo256;
+use frame::traits::tokens::Preservation;
 use frame::traits::Hash;
 
 impl<T: Config> Pallet<T> {
@@ -58,9 +59,17 @@ impl<T: Config> Pallet<T> {
 	pub fn do_buy_kitty(
 		buyer: T::AccountId,
 		kitty_id: [u8; 32],
-		price: BalanceOf<T>,
+		max_price: BalanceOf<T>,
 	) -> DispatchResult {
-		Self::deposit_event(Event::<T>::Sold { buyer, kitty_id, price });
+		let kitty = Kitties::<T>::get(kitty_id).ok_or(Error::<T>::NoKitty)?;
+		let kitty_price = kitty.price.ok_or(Error::<T>::NotForSale)?;
+		ensure!(max_price >= kitty_price, Error::<T>::MaxPriceTooLow);
+
+		let real_price = kitty_price;
+		T::NativeBalance::transfer(&buyer, &kitty.owner, real_price, Preservation::Preserve)?;
+		Self::do_transfer(kitty.owner, buyer.clone(), kitty_id)?;
+
+		Self::deposit_event(Event::<T>::Sold { buyer, kitty_id, price: real_price });
 		Ok(())
 	}
 
