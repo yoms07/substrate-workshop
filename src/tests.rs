@@ -266,3 +266,38 @@ fn transfer_emit_event() {
 		);
 	})
 }
+
+#[test]
+fn transfer_logic_works() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(PalletKitties::create_kitty(RuntimeOrigin::signed(ALICE)));
+		let kitty = &Kitties::<TestRuntime>::iter_values().collect::<Vec<_>>()[0];
+		let kitty_id = kitty.dna;
+
+		assert_eq!(kitty.owner, ALICE);
+		assert_eq!(KittiesOwned::<TestRuntime>::get(ALICE), vec![kitty_id]);
+		assert_eq!(KittiesOwned::<TestRuntime>::get(BOB), vec![]);
+
+		assert_noop!(
+			PalletKitties::transfer(RuntimeOrigin::signed(ALICE), ALICE, kitty_id),
+			Error::<TestRuntime>::TransferToSelf
+		);
+
+		assert_noop!(
+			PalletKitties::transfer(RuntimeOrigin::signed(ALICE), BOB, [0u8; 32]),
+			Error::<TestRuntime>::NoKitty
+		);
+
+		assert_noop!(
+			PalletKitties::transfer(RuntimeOrigin::signed(BOB), ALICE, kitty_id),
+			Error::<TestRuntime>::NotOwner
+		);
+
+		assert_ok!(PalletKitties::transfer(RuntimeOrigin::signed(ALICE), BOB, kitty_id));
+		assert_eq!(KittiesOwned::<TestRuntime>::get(BOB), vec![kitty_id]);
+		assert_eq!(KittiesOwned::<TestRuntime>::get(ALICE), vec![]);
+
+		let kitty = &Kitties::<TestRuntime>::iter_values().collect::<Vec<_>>()[0];
+		assert_eq!(kitty.owner, BOB);
+	})
+}

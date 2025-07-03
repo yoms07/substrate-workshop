@@ -43,6 +43,9 @@ pub mod pallet {
 		TooManyKitties,
 		DuplicateKitty,
 		TooManyOwned,
+		TransferToSelf,
+		NoKitty,
+		NotOwner,
 	}
 
 	#[derive(Encode, Decode, TypeInfo, MaxEncodedLen)]
