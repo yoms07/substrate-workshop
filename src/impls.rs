@@ -55,6 +55,15 @@ impl<T: Config> Pallet<T> {
 		Ok(())
 	}
 
+	pub fn do_buy_kitty(
+		buyer: T::AccountId,
+		kitty_id: [u8; 32],
+		price: BalanceOf<T>,
+	) -> DispatchResult {
+		Self::deposit_event(Event::<T>::Sold { buyer, kitty_id, price });
+		Ok(())
+	}
+
 	pub fn gen_dna() -> [u8; 32] {
 		let unique_payload = (
 			frame_system::Pallet::<T>::parent_hash(),
